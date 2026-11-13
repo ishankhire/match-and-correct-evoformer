@@ -1,0 +1,32 @@
+#!/bin/bash
+#SBATCH --job-name=TMscoreRescore
+#SBATCH --account=YOUR_ALLOCATION
+#SBATCH --partition=cpu
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=2g
+#SBATCH --time=02:00:00
+#SBATCH --constraint="scratch&work"
+#SBATCH --array=0-47%4
+#SBATCH -o tm_scores_layer-%A_%a.out
+#SBATCH -e tm_scores_layer-%A_%a.err
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=YOUR_EMAIL
+
+set -euo pipefail
+module reset
+module load python
+source ~/protein_venv/bin/activate
+export CSV_ROOT=${CSV_ROOT:-/path/to/data}
+SCRIPT_DIR=${SLURM_SUBMIT_DIR:-$(pwd)}
+python3 "$SCRIPT_DIR/canonical_storage.py" --check-write "${TMSCORE_OUTPUT_ROOT:-$CSV_ROOT/regression_5fold_v1/tm_score_optimized_v1}" || exit $?
+export OMP_NUM_THREADS=1
+export OPENBLAS_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+
+if [[ ${TMSCORE_FINALIZE:-0} == 1 ]]; then
+    srun python3 -u "$SCRIPT_DIR/recompute_tm_scores.py" --finalize
+else
+    srun python3 -u "$SCRIPT_DIR/recompute_tm_scores.py" --layer "$SLURM_ARRAY_TASK_ID"
+fi

@@ -1,0 +1,238 @@
+# Fivefold OOF regression release runbook
+
+The published collection is protected by `collection_manifest.json`. Reading
+retained artifacts uses relative indexes and historical checksums. New runs
+require explicit fresh output roots; existing checkpoint identities remain
+unchanged. `canonical_storage.py` defaults repository runs to `delta_files`
+and flat Delta deployments to `/path/to/data`; `CSV_ROOT` is the
+parent of `regression_5fold_v1`. Include `canonical_storage.py` with the
+shared helpers. `canonical_deployment.py` builds the runtime allowlist and
+`deployment_manifest.json` (Git revision, mapping, hashes, binary provenance).
+Slurm stdout/stderr stay in the deployment directory, so rejected launches
+cannot write inside protected results.
+
+This directory contains the protocol-2.0 implementations, launchers, and strict
+aggregators for the four fivefold out-of-fold regression families. Copied results
+are under `delta_files/regression_5fold_v1/`; see
+[current sources and status](../../../docs/project_status.md).
+
+The scientific protocol and output contract remain authoritative in
+`docs/methodology/regression_methodology.md` and
+`docs/methodology/regression_outputs.md`. This file only describes deployment,
+execution, aggregation, and replay.
+
+For per-protein/layer/probe NPY predictions, use the separate
+[packed OOF export runbook](../predicted_distances/README.md). It reads these
+saved models and writes all generated predictions/checkpoints under
+`/path/to/data/regression_5fold_v1/predicted_distances_5fold_v1/`,
+independently of the existing model-input `CSV_ROOT`.
+
+## Delta prerequisites
+
+Follow the [cluster guide](../../../docs/cluster/README.md); cluster changes follow its task authorization and deletion rules.
+
+New reconstruction geometry requires the official `TMscore` executable beside
+the deployed shared helper or via `TMSCORE_BINARY`. See the
+[TM-score runbook](../tm_scores/README.md) for compilation and rescoring saved
+distances. Geometry CSV schemas are unchanged; completed historical checkpoints
+retain their original scores. Keep the distance export's deployed helper files
+frozen until its finalized export is complete.
+
+Recheck the live NCSA Delta
+[running-jobs](https://docs.ncsa.illinois.edu/systems/delta/en/latest/user_guide/running_jobs.html),
+[data-management](https://docs.ncsa.illinois.edu/systems/delta/en/latest/user_guide/data_mgmt.html),
+and [software](https://docs.ncsa.illinois.edu/systems/delta/en/latest/user_guide/software.html)
+documentation before deployment. As checked on 2026-08-28, the launchers use
+the CPU partition, explicitly request both the locked `scratch` dependency and
+the `work` dependency required for `/work/hdd` inputs, reset/load modules, and
+run through Slurm rather than on a login node.
+
+Use the repository's flat deployment root and output convention:
+
+```text
+/path/to/code/
+/path/to/data/regression_5fold_v1/
+```
+
+The account in the checked-in launchers is `YOUR_ALLOCATION`. Confirm that it is
+still returned by `accounts` before submission. Confirm allocation byte/file quota with `quota`. New worker runs use an
+explicit fresh `CSV_ROOT` and copies of the three frozen metadata files.
+The published root is available for reading only.
+
+## Flat deployment inventory
+
+Copy the following to `/path/to/code/` without
+preserving the repository's `cross_validation/` subdirectory:
+
+- this README as `fivefold_regression_README.md`;
+- every non-test `.py`, `.sbatch`, and `.json` file in this directory;
+- `scripts/cluster_scripts/cluster_regression_helpers.py`;
+- `scripts/cluster_scripts/regression_output_helpers.py`;
+- `scripts/cluster_scripts/regression_protocol.py`; and
+- every top-level `.py` and `.sbatch` file under
+  `scripts/cluster_scripts/triangle_violation_subgroups/` when running the
+  downstream triangle replay; and
+- `scripts/cluster_scripts/regression_protocol_data/regression_master_split_v1.csv`
+  under the sole retained subdirectory
+  `regression_protocol_data/regression_master_split_v1.csv`.
+
+The frozen XGBoost selection table is not a runtime input. Its repository path
+and SHA-256 digest are embedded in and validated by the portable fixed
+configuration.
+
+For a new run, copy these three checked-in metadata files to
+`$CSV_ROOT/regression_5fold_v1/metadata/` beneath a fresh explicit `CSV_ROOT`:
+
+```text
+regression_outer_folds_v1.csv
+per_protein_pair_folds_v1.csv
+fold_digests.json
+```
+
+They come from `delta_files/regression_5fold_v1/metadata/`. When `CSV_ROOT` is
+set, every worker and aggregator deliberately loads them from the output root,
+not from the local repository copy.
+
+## Preflight
+
+From the flat deployment directory:
+
+```bash
+cd "/path/to/code"
+module reset
+module load python
+source ~/protein_venv/bin/activate
+export CSV_ROOT=${CSV_ROOT:-/path/to/data}
+python3 -c 'from cross_validation_common import load_cv_folds; b=load_cv_folds(); print(len(b.eligible_protein_ids), [len(b.protein_ids_for_outer_fold(f)) for f in range(5)])'
+python3 -c 'import xgboost; print(xgboost.__version__)'
+bash -n ./*.sbatch
+```
+
+The fold check must print `552 [111, 111, 110, 110, 110]`. A missing XGBoost
+dependency must be repaired in `~/protein_venv` before submitting the XGBoost
+array; the local `.venv` intentionally tests that workflow with a mock.
+
+## Task maps and locked worker requests
+
+| Family | Launcher | Task mapping | Expected shards | Concurrency | Memory | Walltime |
+|---|---|---|---:|---:|---:|---:|
+| Shared OLS | `shared_ols_base256_fold_layer.sbatch` | `task_id = outer_fold * 48 + layer` | 240 | 4 | `120g` | `00:30:00` |
+| Per-protein OLS | `per_protein_ols_base256_layer.sbatch` | `task_id = layer` | 48 | 12 | `12g` | `02:00:00` |
+| Sequence-gated OLS | `sequence_gated_ols_base256_fold_layer.sbatch` | `task_id = outer_fold * 48 + layer` | 240 | 8 | `120g` | `03:00:00` |
+| Fixed shared XGBoost | `shared_xgboost_base256_fixed_s4_fold_layer.sbatch` | `task_id = outer_fold * 48 + layer` | 240 | 3 | `12g` | `00:30:00` |
+
+These are the existing launcher requests. The shared memory and walltime guides
+distinguish saved process measurements from allocation accounting. Submit full
+arrays after authorization; no separate resource pilot is required.
+
+## Submission and restart
+
+The four families are independent and may be submitted separately:
+
+```bash
+sbatch shared_ols_base256_fold_layer.sbatch
+sbatch per_protein_ols_base256_layer.sbatch
+sbatch sequence_gated_ols_base256_fold_layer.sbatch
+sbatch shared_xgboost_base256_fixed_s4_fold_layer.sbatch
+```
+
+Record every returned job ID. Verify completion with allocation-level records,
+for example:
+
+```bash
+sacct -X -j JOB_ID --format=JobID%24,JobName%35,State,Elapsed,ExitCode
+```
+
+Do not aggregate a family until every expected array task is `COMPLETED`.
+Rerunning the same array is the supported restart path: a task skips only when
+its invariants, artifact names, sizes, and SHA-256 hashes match. A missing or
+corrupt checkpoint is not accepted as complete.
+
+## Aggregation and completion audit
+
+Aggregation is production computation and must run inside an approved CPU
+compute allocation, not on a login node. Submit the applicable launcher from
+the flat deployment directory only after every expected worker task for that
+family is `COMPLETED`:
+
+```bash
+sbatch aggregate_shared_ols_base256.sbatch
+sbatch aggregate_per_protein_ols_base256.sbatch
+sbatch aggregate_sequence_gated_ols_base256.sbatch
+sbatch aggregate_shared_xgboost_base256_fixed_s4.sbatch
+```
+
+| Family | Aggregation launcher | CPUs | Memory | Walltime |
+|---|---|---:|---:|---:|
+| Shared OLS | `aggregate_shared_ols_base256.sbatch` | 1 | `8g` | `00:30:00` |
+| Per-protein OLS | `aggregate_per_protein_ols_base256.sbatch` | 1 | `8g` | `01:00:00` |
+| Sequence-gated OLS | `aggregate_sequence_gated_ols_base256.sbatch` | 1 | `8g` | `00:30:00` |
+| Fixed shared XGBoost | `aggregate_shared_xgboost_base256_fixed_s4.sbatch` | 1 | `8g` | `00:30:00` |
+
+These initial requests are comparator-derived rather than measured. The
+per-protein launcher allows extra time because it validates and streams
+6,782,976 stability rows and builds a 132,480-row replay index. After the first
+successful production runs, record allocation-level elapsed time and MaxRSS in
+the shared resource guides. Aggregation reads the chosen result tree and declares `scratch&work`,
+including the `work` dependency required for shared HDD results.
+
+Each production aggregator requires all 48 layers and the exact physical shard
+inventory listed above. It rejects missing or unexpected directories,
+duplicate task identities, incomplete checkpoints, schema/count/coverage
+errors, and size or SHA-256 mismatches. Do not place backup shard directories
+inside `layer_shards/`.
+
+A family is complete only after its aggregator publishes a
+`run_manifest.json` with `run_status=complete`. Audit the manifest's task IDs,
+digests, output counts, and replay count before copying results locally:
+
+| Family | Complete `per_protein.csv` rows | Replay-index rows |
+|---|---:|---:|
+| Shared OLS | 26,496 | 240 |
+| Per-protein OLS | 26,496 | 132,480 |
+| Sequence-gated OLS | 26,496 | 1,440 |
+| Fixed shared XGBoost | 26,496 | 240 |
+
+The absence of a top-level complete manifest means the family is incomplete,
+even if some worker shards exist.
+
+## Triangle-subgroup replay interface
+
+The stable downstream interface is each family's
+`model_artifacts/replay_index.csv` plus the frozen metadata manifests. Resolve
+every `artifact_path` relative to that family root, require `status=complete`,
+and verify the recorded artifact SHA-256, configuration digest, and scaler
+digest before opening pair tensors. Raw pair predictions are intentionally not
+saved.
+
+Responsibility resolution is exact:
+
+- shared OLS and XGBoost use `(layer, outer_fold)`; a protein is replayed with
+  the model whose outer fold equals its entry in
+  `regression_outer_folds_v1.csv`;
+- sequence-gated OLS uses `(layer, outer_fold, sequence_gate)`, with every pair
+  routed through the six canonical sequence-separation gates and no fallback;
+  and
+- per-protein OLS uses `(layer, protein_id, pair_fold)`. Regenerate the five
+  pair folds from `per_protein_pair_folds_v1.csv`, then locate the matching
+  responsibility inside the referenced compressed coefficient shard rather
+  than assuming that replay-index row order is the NPZ array order.
+
+All replay uses strict-lower-triangle unordered pairs and ordered directional
+base256 float64 features. For shared families, every protein receives exactly
+one held-out-fold model. For per-protein OLS, every pair receives exactly the
+one model that withheld its regenerated pair fold. Complete OOF predictions
+must be assembled before triangle or other geometry calculations.
+
+The versioned downstream implementation is
+`triangle_violation_subgroups_5fold_v1`. Run its preparation job after all four
+family manifests are complete, then its 48-task layer array, then its streaming
+aggregator. It writes beneath
+`$CSV_ROOT/regression_5fold_v1/triangle_violation_subgroups_5fold_v1/` and leaves the
+historical protocol-1.0 result tree unchanged. The per-protein OLS replay also
+reports the separate `1_model`/`2_models`/`3_models` cross-fit stitching
+diagnostic; it is not crossed with the seven reference-geometry systems.
+
+Triangle reruns can use `TRIANGLE_OUTPUT_ROOT` independently of producer inputs.
+The published `analysis/triangle_violation_subgroups_5fold_v1` is a relative
+alias to the complete producer bundle.

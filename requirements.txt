@@ -1,0 +1,15 @@
+# Figure regeneration (checked with scripts/verify_figures.py on Python 3.13)
+matplotlib==3.10.8
+numpy==2.4.2
+pandas==3.0.1
+scipy==1.17.1
+pytest
+
+# Cluster compute only (versions recorded in the run manifests)
+scikit-learn==1.8.0
+xgboost==3.2.0
+biopython
+
+# Optional external tools, not installable with pip:
+#   PyMOL      - renders the Fig. S12 panels (render_shared_ols_mds_pymol_panels.py)
+#   TMscore    - built from USalign; see scripts/cluster_scripts/tm_scores/README.md

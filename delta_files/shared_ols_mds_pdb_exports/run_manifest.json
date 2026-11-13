@@ -1,0 +1,143 @@
+{
+  "alignment": "lower_rmsd_of_proper_kabsch_original_or_z_reflection",
+  "analysis_name": "shared_ols_mds_pdb_export",
+  "artifact_provenance": {
+    "fold_1_layer_00": {
+      "fit_status": "fitted",
+      "path": "/path/to/home/csv_files/regression_5fold_v1/shared_ols_base256/model_artifacts/coefficients/fold_1_layer_00.npz",
+      "sha256": "958234a56b605c4297248c099103970816dee76ad81a991b85b57eb677a18653"
+    },
+    "fold_1_layer_10": {
+      "fit_status": "fitted",
+      "path": "/path/to/home/csv_files/regression_5fold_v1/shared_ols_base256/model_artifacts/coefficients/fold_1_layer_10.npz",
+      "sha256": "61727de63ea06e1600aad9a299bb650f786a83e8a6a7021320bb073f00170e5a"
+    },
+    "fold_1_layer_20": {
+      "fit_status": "fitted",
+      "path": "/path/to/home/csv_files/regression_5fold_v1/shared_ols_base256/model_artifacts/coefficients/fold_1_layer_20.npz",
+      "sha256": "9688a556b0911074d51ed0c4e7dc5297076b5c23d663d0c0dca9cceeb5786901"
+    },
+    "fold_1_layer_30": {
+      "fit_status": "fitted",
+      "path": "/path/to/home/csv_files/regression_5fold_v1/shared_ols_base256/model_artifacts/coefficients/fold_1_layer_30.npz",
+      "sha256": "4f2d702dda259f1856d0ade5f4d2c15b902eb98a8d61ad0e74408494bbe8319c"
+    },
+    "fold_1_layer_40": {
+      "fit_status": "fitted",
+      "path": "/path/to/home/csv_files/regression_5fold_v1/shared_ols_base256/model_artifacts/coefficients/fold_1_layer_40.npz",
+      "sha256": "a55afeec8a04714ac5e7cbc79a986f4f10c09c5aa8f650f191421788715d7691"
+    },
+    "fold_1_layer_47": {
+      "fit_status": "fitted",
+      "path": "/path/to/home/csv_files/regression_5fold_v1/shared_ols_base256/model_artifacts/coefficients/fold_1_layer_47.npz",
+      "sha256": "7ba39c0e5b35dd524eae9845e1da5d63717f80e505839040d4341e634b474fb9"
+    },
+    "fold_2_layer_00": {
+      "fit_status": "fitted",
+      "path": "/path/to/home/csv_files/regression_5fold_v1/shared_ols_base256/model_artifacts/coefficients/fold_2_layer_00.npz",
+      "sha256": "6a1113532393511c8d8ce2190801f7aa7787ed6c50419d98beb8a11d1f710459"
+    },
+    "fold_2_layer_10": {
+      "fit_status": "fitted",
+      "path": "/path/to/home/csv_files/regression_5fold_v1/shared_ols_base256/model_artifacts/coefficients/fold_2_layer_10.npz",
+      "sha256": "ddb6d62ade25e5d3609e7dd646479c8f21d6982b2a2b621c5233a9d0b22e8a76"
+    },
+    "fold_2_layer_20": {
+      "fit_status": "fitted",
+      "path": "/path/to/home/csv_files/regression_5fold_v1/shared_ols_base256/model_artifacts/coefficients/fold_2_layer_20.npz",
+      "sha256": "285555eb3e18b0391057cca288d4e39e6822b3fc332202f0532d60b2ffef9082"
+    },
+    "fold_2_layer_30": {
+      "fit_status": "fitted",
+      "path": "/path/to/home/csv_files/regression_5fold_v1/shared_ols_base256/model_artifacts/coefficients/fold_2_layer_30.npz",
+      "sha256": "70272a51517f252b302e90969f6d2ea443768f492750546fd06ad591e02a78d1"
+    },
+    "fold_2_layer_40": {
+      "fit_status": "fitted",
+      "path": "/path/to/home/csv_files/regression_5fold_v1/shared_ols_base256/model_artifacts/coefficients/fold_2_layer_40.npz",
+      "sha256": "c83b6b71afa0b967c9bdaf4b93190ded8a95385214c5704a35b4aaccefbd574b"
+    },
+    "fold_2_layer_47": {
+      "fit_status": "fitted",
+      "path": "/path/to/home/csv_files/regression_5fold_v1/shared_ols_base256/model_artifacts/coefficients/fold_2_layer_47.npz",
+      "sha256": "e266b474546bcee5ba7d4a2781bf0d003203f22541e4155d2a290e82a369a607"
+    },
+    "fold_4_layer_00": {
+      "fit_status": "fitted",
+      "path": "/path/to/home/csv_files/regression_5fold_v1/shared_ols_base256/model_artifacts/coefficients/fold_4_layer_00.npz",
+      "sha256": "f21f3dd341383135d5bf33d612c80b86956b8f5f5aeb7f11cdf30744020acb9e"
+    },
+    "fold_4_layer_10": {
+      "fit_status": "fitted",
+      "path": "/path/to/home/csv_files/regression_5fold_v1/shared_ols_base256/model_artifacts/coefficients/fold_4_layer_10.npz",
+      "sha256": "37085601c18c8b7f93f7121b686402782dcec58f8fc7b15e12590671f8032ce4"
+    },
+    "fold_4_layer_20": {
+      "fit_status": "fitted",
+      "path": "/path/to/home/csv_files/regression_5fold_v1/shared_ols_base256/model_artifacts/coefficients/fold_4_layer_20.npz",
+      "sha256": "fd8bbdc76ace7c42caec213e51a98989b51675165e083f1c514d572babf6903a"
+    },
+    "fold_4_layer_30": {
+      "fit_status": "fitted",
+      "path": "/path/to/home/csv_files/regression_5fold_v1/shared_ols_base256/model_artifacts/coefficients/fold_4_layer_30.npz",
+      "sha256": "f66ea7abe0db12162ea0dd0b4486bedc97be1fe31831544d363ec92197c0be9c"
+    },
+    "fold_4_layer_40": {
+      "fit_status": "fitted",
+      "path": "/path/to/home/csv_files/regression_5fold_v1/shared_ols_base256/model_artifacts/coefficients/fold_4_layer_40.npz",
+      "sha256": "89621858fdd5656d6a03fb12eff2154c4b133af86434e7ae8ffc9812405035b2"
+    },
+    "fold_4_layer_47": {
+      "fit_status": "fitted",
+      "path": "/path/to/home/csv_files/regression_5fold_v1/shared_ols_base256/model_artifacts/coefficients/fold_4_layer_47.npz",
+      "sha256": "ef615030182a7350eb64fa099154749d950c30220adee707464c595c8bf37b75"
+    }
+  },
+  "code_revision": "",
+  "cohort_digest": "ec65eeb90599de6d2b83c83a27df87efd420b5272fbf436ffaadfaee5025d9ea",
+  "completed_at": "2026-09-03T03:34:51.163296+00:00",
+  "configuration_digest": "8354f1b47256567f99962819ca99f1566df69bdb001f985b3fa5b67b6a5dd935",
+  "cv_protocol_version": "2.0",
+  "distance_matrix": "symmetric_zero_diagonal",
+  "elapsed_seconds": 60.810280076926574,
+  "feature_dim": 256,
+  "feature_mode": "directional_base256",
+  "layer_shard_layout": "layer_shards/reconstruction_metrics_layer_<layer>.csv",
+  "layers": [
+    0,
+    10,
+    20,
+    30,
+    40,
+    47
+  ],
+  "n_reconstructed_pdb_files": 60,
+  "n_reference_pdb_files": 10,
+  "negative_prediction_handling": "count_raw_then_clip_to_zero_for_mds",
+  "numpy_version": "2.4.2",
+  "outer_fold_digest": "7d9432555ce0df9b141be8a7866061320d55f712b354cf7206ba55de6b9868cf",
+  "output_root": "/path/to/home/csv_files/regression_5fold_v1/analysis/shared_ols_mds_pdb_exports",
+  "pdb_contents": "aligned_ca_trace_with_deviation_angstrom_in_b_factor",
+  "prediction_scope": "heldout_protein_outer_fold_artifact_replay",
+  "protein_ids": [
+    "7b3a_A",
+    "7dkk_A",
+    "7dq9_A",
+    "7ebt_B",
+    "7f6e_B",
+    "7kdx_B",
+    "7mro_A",
+    "7pbk_A",
+    "7tbs_A",
+    "7tkv_A"
+  ],
+  "python_version": "3.13.5",
+  "raw_pair_predictions_saved": false,
+  "reconstructed_pdb_layout": "pdb_files/<protein_id>/<protein_id>_shared_ols_mds_layer_<layer>.pdb",
+  "reconstruction": "classical_mds_top_three_nonnegative_eigenvalues",
+  "reconstruction_metrics": "reconstruction_metrics.csv",
+  "reference_pdb_layout": "pdb_files/<protein_id>/<protein_id>_reference_ca.pdb",
+  "run_status": "complete",
+  "source_analysis_name": "shared_ols_base256",
+  "source_family_root": "/path/to/home/csv_files/regression_5fold_v1/shared_ols_base256"
+}
